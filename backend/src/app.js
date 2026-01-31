@@ -1,9 +1,11 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
 dotenv.config();
+app.use(express.json());
 
 const PORT = process.env.PORT || 8080;
 const dbURl = process.env.ATLASDB_URL;
@@ -23,6 +25,8 @@ async function main() {
 app.listen(PORT, () => {
   console.log("Listening on PORT : ", PORT);
 });
+
+app.use("/api/auth",authRoutes);
 
 app.get("/health", (req, res) => {
   res.send("all good");
