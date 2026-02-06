@@ -41,11 +41,11 @@ const posts = [
   },
 ];
 
+app.use("/api/auth", authRoutes);
+
 app.get('/posts',authenticateToken,(req,res)=>{
     res.json(posts.filter(post=>post.userId === req.user.userId));
 })
-
-app.use("/api/auth", authRoutes);
 
 
 app.get("/health", (req, res) => {

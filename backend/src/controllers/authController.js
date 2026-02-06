@@ -19,7 +19,7 @@ export function authenticateToken(req, res, next) {
 
 const getAccessToken = (user) => {
   return jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "15s",
+    expiresIn: "10m",
   });
 };
 
@@ -39,7 +39,7 @@ export const refreshAccessToken = async (req, res) => {
     if (!user) {
       return res.status(403).json({ message: "Invalid refresh token" });
     }
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
       if (err) {
         return res.status(403).json({ message: "Invalid refresh token" });
       }
@@ -69,7 +69,7 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = getAccessToken(user);
+    const accessToken = getAccessToken(user);
     const refreshToken = getRefreshToken(user);
 
     user.refreshToken = refreshToken;
@@ -85,7 +85,7 @@ export const loginUser = async (req, res) => {
     return res.status(200).json({
       message: "Login successful",
       userId: user._id,
-      token: token,
+      accessToken: accessToken,
     
     });
   } catch (err) {
