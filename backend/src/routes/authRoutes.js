@@ -3,7 +3,6 @@ import {
   registerUser,
   loginUser,
   logoutUser,
-  authenticateToken,
   refreshAccessToken,
 } from "../controllers/authController.js";
 

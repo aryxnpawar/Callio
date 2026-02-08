@@ -1,4 +1,4 @@
-import express, { urlencoded } from "express";
+import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -15,8 +15,15 @@ const server = createServer(app);
 const io = initSocketServer(server);
 
 io.on("connection", (socket) => {
-  console.log("a user connected with id : ", socket.id);
+  console.log("a user connected with socket id : ", socket.id);
+  console.log("User id : ", socket.user.userId);
+
   socket.emit("welcome", "Welcome to the Socket.IO server");
+
+  socket.on("connect_error", (err) => {
+    console.log("Socket auth failed:", err.message);
+  });
+  
   socket.on("disconnect", () => {
     console.log("Socket disconnected:", socket.id);
   });
@@ -29,7 +36,7 @@ app.use(cors(
   }
 ));
 app.use(express.json());
-app.use(urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const PORT = process.env.APP_PORT || 3000;
@@ -47,11 +54,13 @@ async function main() {
   await mongoose.connect(dbURl);
 }
 
+app.use("/api/auth", authRoutes);
+
 server.listen(PORT, () => {
   console.log("Listening on PORT : ", PORT);
 });
 
-app.use("/api/auth", authRoutes);
+
 
 app.get("/health", (req, res) => {
   res.send("all good");
