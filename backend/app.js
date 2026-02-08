@@ -1,12 +1,33 @@
 import express, { urlencoded } from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors";
 import authRoutes from "./src/routes/authRoutes.js";
 import cookieParser from "cookie-parser";
-import { authenticateToken } from "./src/controllers/authController.js";
+import {initSocketServer} from "./src/controllers/socketManager.js";
+import { createServer } from "node:http";
+
+dotenv.config();
 
 const app = express();
-dotenv.config();
+const server = createServer(app);
+
+const io = initSocketServer(server);
+
+io.on("connection", (socket) => {
+  console.log("a user connected with id : ", socket.id);
+  socket.emit("welcome", "Welcome to the Socket.IO server");
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected:", socket.id);
+  });
+});
+
+app.use(cors(
+  {
+    origin: "http://localhost:5173",
+    credentials: true,
+  }
+));
 app.use(express.json());
 app.use(urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -26,27 +47,11 @@ async function main() {
   await mongoose.connect(dbURl);
 }
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log("Listening on PORT : ", PORT);
 });
 
-const posts = [
-  {
-    userId:"698495203e79e8ca43cbab95",
-    title: "Post 1",
-  },
-  {
-    userId:"698495203e797fca43cbab95",
-    title: "Post 2",
-  },
-];
-
 app.use("/api/auth", authRoutes);
-
-app.get('/posts',authenticateToken,(req,res)=>{
-    res.json(posts.filter(post=>post.userId === req.user.userId));
-})
-
 
 app.get("/health", (req, res) => {
   res.send("all good");
