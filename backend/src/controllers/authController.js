@@ -4,19 +4,6 @@ import jwt from "jsonwebtoken";
 
 const isProd = process.env.NODE_ENV === "production";
 
-// export function authenticateToken(req, res, next) {
-//   const authHeader = req.headers["authorization"];
-//   const token = authHeader && authHeader.split(" ")[1];
-//   if (token == null) return res.sendStatus(401);
-
-//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-//     if (err) return res.sendStatus(403);
-//     console.log(user);
-//     req.user = user;
-//     next();
-//   });
-// }
-
 const getAccessToken = (user) => {
   return jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "10m",
@@ -37,16 +24,20 @@ export const refreshAccessToken = async (req, res) => {
     }
     const user = await User.findOne({ refreshToken: refreshToken });
     if (!user) {
-      return res.status(403).json({ message: "Invalid refresh token" });
+      return res.status(403).json({ message: "No such User" });
     }
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-      if (err) {
-        return res.status(403).json({ message: "Invalid refresh token" });
-      }
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+      (err, decoded) => {
+        if (err) {
+          return res.status(403).json({ message: "Invalid refresh token" });
+        }
 
-      const newAccessToken = getAccessToken(user);
-      return res.json({ accessToken: newAccessToken });
-    });
+        const newAccessToken = getAccessToken(user);
+        return res.json({ accessToken: newAccessToken });
+      }
+    );
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Server Error" });
@@ -86,7 +77,6 @@ export const loginUser = async (req, res) => {
       message: "Login successful",
       userId: user._id,
       accessToken: accessToken,
-    
     });
   } catch (err) {
     console.log(err);
@@ -97,22 +87,21 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
-    if(!refreshToken){
-      return res.status(400).json({message:"Refresh token is required"});
+    if (!refreshToken) {
+      return res.status(400).json({ message: "Refresh token is required" });
     }
-    const user = await User.findOne({refreshToken: refreshToken});
-    if(!user){
-      return res.status(403).json({message:"Invalid refresh token"});
+    const user = await User.findOne({ refreshToken: refreshToken });
+    if (!user) {
+      return res.status(403).json({ message: "Invalid refresh token" });
     }
 
     user.refreshToken = null;
     await user.save();
 
-  res.clearCookie("refreshToken");
+    res.clearCookie("refreshToken");
 
-    return res.status(200).json({message:"Logout successful"});
-  } 
-  catch (err) {
+    return res.status(200).json({ message: "Logout successful" });
+  } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Server Error" });
   }
