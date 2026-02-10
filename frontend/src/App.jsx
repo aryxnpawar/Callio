@@ -1,21 +1,25 @@
-import { useState, useEffect, useRef } from "react";
-import { io } from "socket.io-client";
-import axios from "axios";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
-
-const socket = io("http://localhost:3000",{
-  
-});
-
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
-  const [message, setMessage] = useState("");
-  
   return (
-    <>
-      <h1>Welcome to the Frontend!</h1>
-      {message && <p>{message}</p>}
-    </>
+
+      <BrowserRouter>
+
+      <Link to="/login">Login</Link>
+      <br />
+      <Link to="/register">Register</Link>
+
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
+      </BrowserRouter>
+
   );
 }
 
