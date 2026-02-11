@@ -47,6 +47,8 @@ export const refreshAccessToken = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+    //add error handling for empty body
+    //add error handling for invalid post request
     if (!email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -110,6 +112,8 @@ export const logoutUser = async (req, res) => {
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    //add error handling for empty body
+    //add error handling for invalid post request
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });

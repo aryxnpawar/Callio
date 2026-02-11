@@ -11,6 +11,7 @@ export const createMeeting = async (req, res) => {
 
     await newMeeting.save();
     res.status(201).json({ meetingCode: newMeeting.meetingCode });
+    
   } catch (err) {
     console.log("Error Occured : ", err);
     res.status(500).json({ message: "Internal Server Error" });

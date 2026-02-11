@@ -18,11 +18,11 @@ const io = initSocketServer(server);
 io.on("connection", (socket) => {
   console.log("Socket connected:", socket.id);
 
-  socket.on("join-meeting", ({ meetingId }) => {
-    socket.join(meetingId);
-
-    socket.to(meetingId).emit("user-joined", {
-      userId: socket.user.userId,
+  socket.on("join-room", ({roomId})=>{
+    socket.join(roomId);
+    console.log(`Socket ${socket.id} joined room ${roomId}`);
+    socket.to(roomId).emit("user-joined", {
+      socketId: socket.id,
     });
   });
 
