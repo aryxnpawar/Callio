@@ -9,12 +9,12 @@ import { useState, useEffect } from "react";
 const socket = io("http://localhost:3000", {
   auth: {
     token:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OThjOGRlY2ZjMmUwZTY1MTViZGMwMDUiLCJpYXQiOjE3NzA4OTQwODYsImV4cCI6MTc3MDg5NDY4Nn0.XRqd7Zx1sehi_59_XMH93XoY5_q04pMDdB4LbHd6lzo",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTg0OTUyMDNlNzllOGNhNDNjYmFiOTUiLCJpYXQiOjE3NzA4OTgxNzgsImV4cCI6MTc3MDg5ODc3OH0.tdHhQyY7MsUsg344cbaw5tx6ABurIZ8cgcDoTZrYcyE",
   },
 });
 
 function App() {
-  const [roomId, setRoomId] = useState("12345");
+  const [roomId, setRoomId] = useState("70583843a7");
   useEffect(() => {
     socket.on("connect", () => {
       console.log(socket.id);

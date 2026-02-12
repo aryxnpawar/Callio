@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const meetingSchema = new mongoose.Schema(
   {
-    meetingCode: {
+    roomId: {
       type: String,
       required: true,
       unique: true,

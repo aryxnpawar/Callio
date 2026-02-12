@@ -5,6 +5,6 @@ import { createMeeting,joinMeeting,getParticipants} from "../controllers/meeting
 const router = express.Router();
 
 router.post("/create", authenticateToken, createMeeting);
-router.post("/join",authenticateToken,joinMeeting);
+// router.post("/join",authenticateToken,joinMeeting);
 router.get('/:roomId/participants',authenticateToken,getParticipants)
 export default router;
