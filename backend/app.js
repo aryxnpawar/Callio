@@ -13,24 +13,7 @@ dotenv.config();
 const app = express();
 const server = createServer(app);
 
-const io = initSocketServer(server);
-
-io.on("connection", (socket) => {
-  console.log("Socket connected:", socket.id);
-
-  socket.on("join-room", ({roomId})=>{
-    socket.join(roomId);
-    console.log(`Socket ${socket.id} joined room ${roomId}`);
-    socket.to(roomId).emit("user-joined", {
-      socketId: socket.id,
-    });
-  });
-
-  socket.on("disconnect", () => {
-    console.log("Socket disconnected:", socket.id);
-  });
-});
-
+initSocketServer(server);
 
 app.use(
   cors({
@@ -54,7 +37,7 @@ main()
   });
 
 async function main() {
-  await mongoose.connect(dbURl,{family: 4,tls:true,retryWrites: true,});
+  await mongoose.connect(dbURl, { family: 4, tls: true, retryWrites: true });
 }
 
 app.use("/api/auth", authRoutes);
