@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import authenticateSocket from "../middlewares/authenticateSocket.js";
+import Meeting from "../models/Meeting.js";
 
 export const meetingParticipants = new Map();
 
@@ -18,8 +19,15 @@ export const initSocketServer = (server) => {
   io.on("connection", (socket) => {
     console.log("Socket connected:", socket.id);
 
-    socket.on("join-room", ( roomId ) => {
+    socket.on("join-room", async (roomId) => {
       if (!roomId) return;
+
+      const meeting = await Meeting.findOne({ roomId: roomId });
+
+      if(!meeting || !meeting.isActive){
+        socket.emit("meeting-not-active");
+        return;
+      }
 
       socket.join(roomId);
 

@@ -1,12 +1,13 @@
 import Meeting from "../models/Meeting.js";
 import crypto from "crypto";
 import { meetingParticipants } from "./socketManager.js";
+import { getIo } from "./socketManager.js";
 
 export const createMeeting = async (req, res) => {
   try {
     const roomId = crypto.randomBytes(5).toString("hex");
     const newMeeting = new Meeting({
-     roomId,
+      roomId:roomId,
       host: req.user.userId,
     });
 
@@ -16,6 +17,32 @@ export const createMeeting = async (req, res) => {
     console.log("Error Occured : ", err);
     res.status(500).json({ message: "Internal Server Error" });
   }
+};
+
+export const endMeeting = async (req,res) => {
+  const { roomId } = req.params;
+  const userId = req.user.userId;
+
+  if (!roomId) return res.status(400).json({ message: "Room Id is required" });
+
+  const meeting = await Meeting.findOne({ roomId: roomId });
+  if (!meeting) return res.status(404).json({ message: "Meeting not found" });
+
+  if (meeting.host.toString() !== userId)
+    return res.status(403).json({ message: "only hosts can end meeting" });
+
+  if(!meeting.isActive)
+    return res.status(400).json({message:"meeting already ended"})
+  
+  meeting.isActive = false;
+  await meeting.save();
+
+  const io = getIo();
+  io.to(roomId).emit("meeting-ended"); //but what does this do
+
+  meetingParticipants.delete(roomId);
+
+  return res.status(200).json({ message: "Meeting ended successfully" });
 };
 
 // export const joinMeeting = async (req, res) => {

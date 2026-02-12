@@ -22,6 +22,14 @@ function App() {
 
     socket.emit('join-room',(roomId))
 
+    socket.on("meeting-ended",()=>{
+      console.log('meeting ended')
+    });
+
+    socket.on("meeting-not-active",()=>{
+      console.log(" no such meeting or has ended")
+    });
+
     socket.on("offer", ({ offer, roomId }) => {
       console.log("got offer :", offer, ", from room :", roomId);
     });
