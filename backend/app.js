@@ -37,7 +37,7 @@ main()
   });
 
 async function main() {
-  await mongoose.connect(dbURl, { family: 4, tls: true, retryWrites: true });
+  await mongoose.connect(dbURl,);
 }
 
 app.use("/api/auth", authRoutes);

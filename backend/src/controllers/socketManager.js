@@ -18,7 +18,7 @@ export const initSocketServer = (server) => {
   io.on("connection", (socket) => {
     console.log("Socket connected:", socket.id);
 
-    socket.on("join-room", ({ roomId }) => {
+    socket.on("join-room", ( roomId ) => {
       if (!roomId) return;
 
       socket.join(roomId);
@@ -30,6 +30,22 @@ export const initSocketServer = (server) => {
       meetingParticipants.get(roomId).add(socket.id);
 
       socket.to(roomId).emit("user-joined", { socketId: socket.id });
+    });
+
+    socket.on("offer", ({ offer, roomId }) => {
+      if (!offer || !roomId) return;
+
+      socket.to(roomId).emit("offer", { offer, roomId });
+    });
+
+    socket.on("answer", ({ answer, roomId }) => {
+      if (!answer || !roomId) return;
+      socket.to(roomId).emit("answer", { answer, roomId });
+    });
+
+    socket.on("ice-candidate", ({ candidate, roomId }) => {
+      if (!candidate || !roomId) return;
+      socket.to(roomId).emit("ice-candidate", { candidate, roomId });
     });
 
     socket.on("disconnect", () => {
