@@ -45,32 +45,29 @@ export const endMeeting = async (req,res) => {
   return res.status(200).json({ message: "Meeting ended successfully" });
 };
 
-// export const joinMeeting = async (req, res) => {
-//   try {
-//     const { roomId } = req.body;
-//     if (!roomId) {
-//       return res.status(400).json({ message: "Meeting code required" });
-//     }
-//     const meeting = await Meeting.findOne({
-//       roomId: roomId,
-//       isActive: true,
-//     });
-//     if (!meeting) {
-//       return res
-//         .status(403)
-//         .json({ message: "Meeting not found or has ended" });
-//     }
-//     return res.status(200).json({
-//       message: "Joined meeting successfully",
-//       meetingId: meeting._id,
-//       roomId: meeting.roomId,
-//       host: meeting.host._id,
-//     });
-//   } catch (err) {
-//     console.log("Error Occured : ", err);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// };
+export const checkMeeting = async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    if (!roomId) {
+      return res.status(400).json({ message: "Meeting Id required" });
+    }
+    const meeting = await Meeting.findOne({
+      roomId: roomId,
+      isActive: true,
+    });
+    if (!meeting) {
+      return res
+        .status(403)
+        .json({ message: "Meeting not found or has ended" });
+    }
+    return res.status(200).json({
+      message: "Meeting is Active",
+    });
+  } catch (err) {
+    console.log("Error Occured : ", err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 export const getParticipants = (req, res) => {
   const { roomId } = req.params;

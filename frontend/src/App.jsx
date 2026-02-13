@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
+import Meeting from "./pages/Meeting";
 
 function App() {
   return (
@@ -34,6 +35,15 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/meeting/:roomId"
+          element={
+            <ProtectedRoute>
+              <Meeting />
+            </ProtectedRoute>
+          }
+        ></Route>
       </Routes>
     </>
   );
