@@ -1,8 +1,18 @@
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 function Dashboard() {
+  const {logout} = useAuth();
+  const navigate = useNavigate();
+  async function handleLogOut(){
+    await logout();
+    navigate("/login")
+  }
   return (
     <div>
       <h1>Dashboard</h1>
       <p>Welcome to your dashboard! Here you can manage your meetings and settings.</p>
+      <button onClick={handleLogOut}>Logout</button>
     </div>
   );
 }

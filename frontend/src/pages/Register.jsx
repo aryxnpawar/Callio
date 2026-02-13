@@ -1,30 +1,30 @@
 import { useState } from "react";
+import axios from "../api/axios";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
-      const res = await fetch("http://localhost:3000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    try {
+      const response = await axios.post(
+        "/api/auth/register",
+        {
+          name,
+          email,
+          password,
         },
-        body: JSON.stringify({ name,email, password }),
-      });
-  
-      if (!res.ok) {
-        alert("Register failed");
-        return;
-      }
-  
-      const data = await res.json();
-      console.log(data);
-    }
-    catch(err){
+        { withCredentials: true }
+      );
+      login(response.data.accessToken);
+      navigate("/dashboard");
+    } catch (err) {
       console.error("Error during Register:", err);
       alert("An error occurred during Register. Please try again.");
     }
@@ -39,7 +39,7 @@ function Register() {
         type="text"
         value={name}
         onChange={(e) => {
-            setName(e.target.value);
+          setName(e.target.value);
         }}
       />
 
@@ -68,6 +68,7 @@ function Register() {
       <br />
 
       <button type="submit">Register</button>
+      
     </form>
   );
 }
