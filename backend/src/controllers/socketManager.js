@@ -22,57 +22,64 @@ export const initSocketServer = (server) => {
     socket.on("join-room", async (roomId) => {
       if (!roomId) return;
 
-      const meeting = await Meeting.findOne({ roomId: roomId });
-
-      if(!meeting || !meeting.isActive){
+      try {
+        const meeting = await Meeting.findOne({ roomId: roomId });
+        if (!meeting || !meeting.isActive) {
+          socket.emit("meeting-not-active");
+          return;
+        }
+      } catch (err) {
+        console.error("Error checking meeting:", err);
         socket.emit("meeting-not-active");
-        return;
       }
 
       socket.join(roomId);
+      socket.roomId = roomId;
 
       if (!meetingParticipants.has(roomId)) {
         meetingParticipants.set(roomId, new Set());
       }
+
+      const existingParticipants = Array.from(meetingParticipants.get(roomId));
+      socket.emit("existing-participants", existingParticipants);
 
       meetingParticipants.get(roomId).add(socket.id);
 
       socket.to(roomId).emit("user-joined", { socketId: socket.id });
     });
 
-    socket.on("offer", ({ offer, roomId }) => {
-      if (!offer || !roomId) return;
-
-      socket.to(roomId).emit("offer", { offer, roomId });
+    socket.on("offer", ({ offer, to }) => {
+      if (!offer || !to) return;
+      socket.to(to).emit("offer", { offer: offer, from: socket.id });
     });
 
-    socket.on("answer", ({ answer, roomId }) => {
-      if (!answer || !roomId) return;
-      socket.to(roomId).emit("answer", { answer, roomId });
+    socket.on("answer", ({ answer, to }) => {
+      if (!answer || !to) return;
+      socket.to(to).emit("answer", { answer: answer, from: socket.id });
     });
 
-    socket.on("ice-candidate", ({ candidate, roomId }) => {
-      if (!candidate || !roomId) return;
-      socket.to(roomId).emit("ice-candidate", { candidate, roomId });
+    socket.on("ice-candidate", ({ candidate, to }) => {
+      if (!candidate || !to) return;
+      socket
+        .to(to)
+        .emit("ice-candidate", { candidate: candidate, from: socket.id });
     });
 
     socket.on("disconnect", () => {
-      for (const [roomId, participants] of meetingParticipants.entries()) {
-        if (participants.has(socket.id)) {
-          participants.delete(socket.id);
-
-          socket.to(roomId).emit("user-left", { socketId: socket.id });
-        }
-        if (participants.size === 0) {
+      const roomId = socket.roomId;
+      if (roomId && meetingParticipants.has(roomId)) {
+        meetingParticipants.get(roomId).delete(socket.id);
+        socket.to(roomId).emit("user-left", { socketId: socket.id });
+        if (meetingParticipants.get(roomId).size === 0)
           meetingParticipants.delete(roomId);
-        }
       }
-
-      console.log("Socket disconnected:", socket.id);
     });
   });
 
   return io;
 };
 
-export const getIo = () => io;
+export const getIo = () => {
+  if (!io) throw new Error("Socket.io not initialized");
+  return io;
+}
