@@ -69,7 +69,9 @@ export const initSocketServer = (server) => {
       const roomId = socket.roomId;
       if (roomId && meetingParticipants.has(roomId)) {
         meetingParticipants.get(roomId).delete(socket.id);
+
         socket.to(roomId).emit("user-left", { socketId: socket.id });
+        
         if (meetingParticipants.get(roomId).size === 0)
           meetingParticipants.delete(roomId);
       }
@@ -82,4 +84,4 @@ export const initSocketServer = (server) => {
 export const getIo = () => {
   if (!io) throw new Error("Socket.io not initialized");
   return io;
-}
+};

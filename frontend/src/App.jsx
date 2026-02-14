@@ -5,7 +5,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
-import Meeting from "./pages/Meeting";
+import MeetingRoom from "./pages/MeetingRoom";
 
 function App() {
   return (
@@ -40,7 +40,7 @@ function App() {
           path="/meeting/:roomId"
           element={
             <ProtectedRoute>
-              <Meeting />
+              <MeetingRoom />
             </ProtectedRoute>
           }
         ></Route>
