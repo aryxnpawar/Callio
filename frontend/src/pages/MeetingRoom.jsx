@@ -23,6 +23,9 @@ function MeetingRoom() {
   const [localConnected, setLocalConnected] = useState(false);
   const [remoteConnected, setRemoteConnected] = useState(false);
 
+  const [isMicOn, setIsMicOn] = useState(true);
+  const [isCameraOn, setIsCameraOn] = useState(true);
+
   const createPeerConnection = (socket, remoteSocketId) => {
     const pc = new RTCPeerConnection(ICE_SERVERS);
 
@@ -80,7 +83,7 @@ function MeetingRoom() {
         return;
       }
 
-    socket = io("http://localhost:3000", {
+      socket = io("http://localhost:3000", {
         auth: { token: accessToken },
       });
       socketRef.current = socket;
@@ -91,7 +94,6 @@ function MeetingRoom() {
         socket.emit("join-room", roomId);
       });
 
-      
       socket.on("existing-participants", async (participants) => {
         if (participants.length === 0) {
           console.log("No one else here, Waiting...");
@@ -178,6 +180,22 @@ function MeetingRoom() {
     };
   }, [roomId, accessToken, navigate]);
 
+  const toggleMic = () => {
+    const audioTrack = localStreamRef.current?.getAudioTracks()[0];
+    if (audioTrack) {
+      audioTrack.enabled = !audioTrack.enabled;
+      setIsMicOn(audioTrack.enabled);
+    }
+  };
+
+  const toggleCamera = () => {
+    const videoTrack = localStreamRef.current?.getVideoTracks()[0];
+    if (videoTrack) {
+      videoTrack.enabled = !videoTrack.enabled;
+      setIsCameraOn(videoTrack.enabled);
+    }
+  };
+
   const leaveMeeting = () => {
     navigate("/dashboard");
     // Cleanup happens automatically via the useEffect return
@@ -220,6 +238,12 @@ function MeetingRoom() {
         </div>
       </div>
       <div style={{ marginTop: "20px" }}>
+        <button onClick={toggleMic}>
+          {isMicOn ? "Mute Mic" : "Unmute Mic"}
+        </button>
+        <button onClick={toggleCamera}>
+          {isCameraOn ? "Turn Off Camera" : "Turn On Camera"}
+        </button>
         <button onClick={leaveMeeting}>Leave Meeting</button>
       </div>
     </div>
