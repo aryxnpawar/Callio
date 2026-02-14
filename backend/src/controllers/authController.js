@@ -2,12 +2,12 @@ import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 
-const cookieOptions = {
+const getCookieOptions = () => ({
   httpOnly: true,
   secure: true,
   sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
   maxAge: 7 * 24 * 60 * 60 * 1000,
-};
+});
 
 const getAccessToken = (user) => {
   return jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, {
@@ -73,7 +73,7 @@ export const loginUser = async (req, res) => {
     user.refreshToken = refreshToken;
     await user.save();
 
-    res.cookie("refreshToken", refreshToken, cookieOptions);
+    res.cookie("refreshToken", refreshToken, getCookieOptions());
 
     return res.status(200).json({
       message: "Login successful",
@@ -142,7 +142,7 @@ export const registerUser = async (req, res) => {
     newUser.refreshToken = refreshToken;
     await newUser.save();
 
-    res.cookie("refreshToken", refreshToken, cookieOptions);
+    res.cookie("refreshToken", refreshToken, getCookieOptions());
 
     console.log(newUser);
 
