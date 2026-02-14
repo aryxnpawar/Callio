@@ -11,6 +11,8 @@ const ICE_SERVERS = {
   ],
 };
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 function MeetingRoom() {
   const { accessToken } = useAuth();
   const { roomId } = useParams();
@@ -87,7 +89,7 @@ function MeetingRoom() {
         return;
       }
 
-      socket = io("http://localhost:3000", {
+      socket = io(API_URL, {
         auth: { token: accessToken },
       });
       socketRef.current = socket;

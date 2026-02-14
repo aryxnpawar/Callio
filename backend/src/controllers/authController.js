@@ -2,6 +2,13 @@ import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: true,
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+};
+
 const getAccessToken = (user) => {
   return jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "10m",
@@ -66,12 +73,7 @@ export const loginUser = async (req, res) => {
     user.refreshToken = refreshToken;
     await user.save();
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie("refreshToken", refreshToken, cookieOptions);
 
     return res.status(200).json({
       message: "Login successful",
@@ -83,62 +85,6 @@ export const loginUser = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
-
-// export const logoutUser = async (req, res) => {
-//   try {
-//     const refreshToken = req.cookies.refreshToken;
-//     if (!refreshToken) {
-//       return res.status(400).json({ message: "Refresh token is required" });
-//     }
-//     const user = await User.findOne({ refreshToken: refreshToken });
-//     if (!user) {
-//       return res.status(403).json({ message: "Invalid refresh token" });
-//     }
-
-//     user.refreshToken = null;
-//     await user.save();
-
-//     res.clearCookie("refreshToken");
-
-//     return res.status(200).json({ message: "Logout successful" });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({ message: "Server Error" });
-//   }
-// };
-
-// export const registerUser = async (req, res) => {
-//   try {
-//     const { name, email, password } = req.body;
-//     //add error handling for empty body
-//     //add error handling for invalid post request
-
-//     if (!name || !email || !password) {
-//       return res.status(400).json({ message: "All fields are required" });
-//     }
-
-//     const existingUser = await User.findOne({ email: email });
-//     if (existingUser) {
-//       return res.status(409).json({ message: "User already registered" });
-//     }
-
-//     const hashedPassword = await bcrypt.hash(password, 12);
-
-//     const newUser = await User.create({
-//       name: name,
-//       email: email,
-//       password: hashedPassword,
-//     });
-//     console.log(newUser);
-//     return res.status(201).json({
-//       message: "User registered successfully",
-//       userId: newUser._id,
-//     });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({ message: "Server Error" });
-//   }
-// };
 
 export const logoutUser = async (req, res) => {
   try {
@@ -157,7 +103,7 @@ export const logoutUser = async (req, res) => {
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
     });
 
     return res.status(200).json({ message: "Logout successful" });
@@ -196,12 +142,7 @@ export const registerUser = async (req, res) => {
     newUser.refreshToken = refreshToken;
     await newUser.save();
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie("refreshToken", refreshToken, cookieOptions);
 
     console.log(newUser);
 
