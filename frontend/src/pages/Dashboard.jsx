@@ -34,7 +34,7 @@ function Dashboard() {
     }
 
     try {
-      const response = await axios.get(`/meeting/${roomId}/check`, {
+      await axios.get(`/meeting/${roomId}/check`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       navigate(`/meeting/${roomId}`,{ state: { isHost: false } });

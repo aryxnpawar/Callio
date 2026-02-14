@@ -5,8 +5,9 @@ import Meeting from "../models/Meeting.js";
 export const meetingParticipants = new Map();
 
 let io;
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+
 export const initSocketServer = (server) => {
+  const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
   io = new Server(server, {
     cors: {
       origin: CLIENT_URL,
@@ -72,7 +73,7 @@ export const initSocketServer = (server) => {
         meetingParticipants.get(roomId).delete(socket.id);
 
         socket.to(roomId).emit("user-left", { socketId: socket.id });
-        
+
         if (meetingParticipants.get(roomId).size === 0)
           meetingParticipants.delete(roomId);
       }
