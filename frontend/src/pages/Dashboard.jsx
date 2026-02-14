@@ -19,7 +19,7 @@ function Dashboard() {
         {},
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
-      navigate(`/meeting/${response.data.roomId}`);
+      navigate(`/meeting/${response.data.roomId}`,{ state: { isHost: true } });
     } catch (err) {
       console.log(err);
       alert("something went wrong while creating new meeting");
@@ -37,7 +37,7 @@ function Dashboard() {
       const response = await axios.get(`/meeting/${roomId}/check`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      navigate(`/meeting/${roomId}`);
+      navigate(`/meeting/${roomId}`,{ state: { isHost: false } });
     } catch (err) {
       const message = err.response?.data?.message || "Unable to join meeting";
       alert(message);

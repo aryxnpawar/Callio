@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams,useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
+import axios from "../api/axios";
 
 const ICE_SERVERS = {
   iceServers: [
@@ -19,6 +20,9 @@ function MeetingRoom() {
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const isHost = location.state?.isHost || false;
 
   const [localConnected, setLocalConnected] = useState(false);
   const [remoteConnected, setRemoteConnected] = useState(false);
@@ -196,9 +200,22 @@ function MeetingRoom() {
     }
   };
 
+  const endMeeting = async () => {
+    try {
+      await axios.post(
+        `/meeting/${roomId}/end`,
+        {},
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Error ending meeting:", err);
+      alert("Failed to end meeting");
+    }
+  };
+
   const leaveMeeting = () => {
     navigate("/dashboard");
-    // Cleanup happens automatically via the useEffect return
   };
 
   return (
@@ -245,6 +262,11 @@ function MeetingRoom() {
           {isCameraOn ? "Turn Off Camera" : "Turn On Camera"}
         </button>
         <button onClick={leaveMeeting}>Leave Meeting</button>
+        {isHost && (
+          <button onClick={endMeeting} style={{ background: "red", color: "white" }}>
+            End Meeting
+          </button>
+        )}
       </div>
     </div>
   );

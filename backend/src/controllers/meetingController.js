@@ -40,7 +40,7 @@ export const endMeeting = async (req, res) => {
     await meeting.save();
 
     const io = getIo();
-    io.to(roomId).emit("meeting-ended"); //but what does this do
+    io.to(roomId).emit("meeting-ended");
 
     meetingParticipants.delete(roomId);
 
