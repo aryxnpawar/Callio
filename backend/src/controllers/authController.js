@@ -23,6 +23,8 @@ const getRefreshToken = (user) => {
 
 export const refreshAccessToken = async (req, res) => {
   try {
+    console.log("Cookies received:", req.cookies);
+    console.log("NODE_ENV:", process.env.NODE_ENV);
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
       return res.status(400).json({ message: "Refresh token is reqired" });
